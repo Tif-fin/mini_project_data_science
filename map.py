@@ -2,13 +2,14 @@ import pandas  as pd
 import matplotlib.pyplot as plt
 import geopandas as gpd 
 import os 
+import regex as re 
 
 class Map:
     __folder_path = './districts_geojson'
     map_gdfs = []
     def __init__(self):
         self.map_gdfs = self.__concatGeoDataFrame()
-        self.__fixDiffernce() 
+        self.__fixDifference() 
     
     def __loadgeoJson(self):
         gdfs = []
@@ -28,21 +29,29 @@ class Map:
         # Merge DataFrame
         dataFrame['DISTRICT'] = dataFrame['District'].str.upper().sort_values()
         #check for the difference
-        self.map_gdfs = pd.merge(self.map_gdfs, dataFrame,on='DISTRICT',how='inner')
+        self.map_gdfs = pd.merge(self.map_gdfs, dataFrame,on='DISTRICT',how='outer')
         self.map_gdfs=self.map_gdfs.drop('District',axis=1)
         return self.map_gdfs
 
-    def __fixDiffernce(self):
+    def __fixDifference(self):
         '''
-            Fix the spelling mistake  
+            Fix the spelling mistake
         '''
-        difference= ['CHITWAN', 'EASTERN RUKUM', 'KAVREPALANCHOWK', 'NAWALPUR',
-       'PARASI', 'SINDHUPALCHOK', 'TANAHU', 'TEHRATHUM', 'WESTERN RUKUM']
-        district= ['CHITAWAN', 'RUKUM', 'KAVREPALANCHOK', 'NAWALPARASI',
-       'NAWALPARASI', 'SINDHUPALCHOWK', 'TANAHUN', 'TEHRATHUM', 'RUKUM']
-        district = district
-        #replace the district name 
-        for index in range(len(difference)):
-            # print(f"Replacing district name :{difference[index]}  to {district[index]} ")
-            self.map_gdfs['DISTRICT']=self.map_gdfs['DISTRICT'].str.replace(difference[index],district[index])
+        # Define the district names with differences
+        difference = ['CHITWAN', 'EASTERN RUKUM', 'KAVREPALANCHOWK', 'NAWALPUR',
+                    'PARASI', 'SINDHUPALCHOK', 'TANAHU', 'TEHRATHUM', 'WESTERN RUKUM']
+        district = ['CHITAWAN', 'RUKUM', 'KAVREPALANCHOK', 'NAWALPARASI',
+                    'NAWALPARASI', 'SINDHUPALCHOWK', 'TANAHUN', 'TERHATHUM', 'RUKUM']
+
+        # Create a list of tuples for the replacements
+        replacements = list(zip(difference, district))
+
+        # Sort replacements to handle "NAWALPUR" and "PARASI" correctly by length (longer first)
+        replacements.sort(key=lambda x: len(x[0]), reverse=True)
+
+        # Replace the district names
+        for diff, dist in replacements:
+            pattern = r'\b{}\b'.format(re.escape(diff))  # Create a word boundary pattern
+            self.map_gdfs['DISTRICT'] = self.map_gdfs['DISTRICT'].str.replace(pattern, dist, regex=True)
+
         return None
