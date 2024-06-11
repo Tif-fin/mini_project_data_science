@@ -1,6 +1,5 @@
 import pandas  as pd 
 from pandas import _typing
-import matplotlib.pyplot as plt
 import geopandas as gpd 
 import os 
 import regex as re 
@@ -125,3 +124,4 @@ class Map:
         self.map_gdfs = self.__original_gdfs.copy()
         self.__fixDifference() 
         return self.map_gdfs
+    
