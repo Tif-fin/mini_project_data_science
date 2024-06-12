@@ -1,4 +1,10 @@
 # Data Science Mini Project
+by:
+- [Diwas Shrestha](https://github.com/diwas7777)
+- [Safal Shrestha](https://github.com/devsafal)
+- [Nimesh Timalsina](https://github.com/GOGHSY)
+- [Om Shankhar Ray Rajput](#)
+
 ----
 ## Data Used:
 - `Kaggle`: District wise school data of all subject marks
